@@ -1,9 +1,15 @@
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.html5.Location;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -38,14 +44,31 @@ public class CalculatorTest {
 		
 		try {
 			
+			List<String>Coordinates =ReadKml();
+
+			for (String string : Coordinates) {
+				System.out.println(string);
+			}		
+			
  			AndroidDriver driver ;
 			 driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub/"), capabilities);
+			 
+			 float Lat,Lng,Alt;
+			 
+			String[] Parts= Coordinates.get(0).split(",");
+			 
+			
+			System.out.println("Location: "+Double.parseDouble(Parts[1])+","+ Double.parseDouble(Parts[0]));
+			
+			 driver.setLocation(new Location(Double.parseDouble(Parts[1]), Double.parseDouble(Parts[0]),Double.parseDouble(Parts[2]))); 
+			 
+			 
 			WebElement we= driver.findElement(By.xpath("//android.widget.EditText[@content-desc=\"Search here\"]/android.widget.TextView"));
 			
 			Thread.sleep(1000);
 			we.click();
 			Thread.sleep(1000);
-			driver.findElement(By.id("com.google.android.apps.maps:id/search_omnibox_edit_text")).sendKeys("Katraj");
+			driver.findElement(By.id("com.google.android.apps.maps:id/search_omnibox_edit_text")).sendKeys("Orlando");
 			
 			driver.executeScript("mobile: performEditorAction", ImmutableMap.of("action", "search"));
 			//driver.findElement(By.id("com.google.android.apps.maps:id/search_omnibox_edit_text")).sendKeys(Keys.ENTER);
@@ -56,6 +79,17 @@ public class CalculatorTest {
 			driver.findElement(By.id("android:id/button1")).click();
 			Thread.sleep(1000);
 			driver.findElement(By.xpath("//android.view.View[@content-desc=\"Dismiss\"]")).click();
+						
+			Thread.sleep(1000);
+			
+			for (int i=0;i<Coordinates.size();i++) {
+				Parts= Coordinates.get(i).split(",");
+				 
+				 driver.setLocation(new Location(Double.parseDouble(Parts[1]), Double.parseDouble(Parts[0]),Double.parseDouble(Parts[2]))); 
+				 
+				Thread.sleep(500);
+			}		
+			
 
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
@@ -66,6 +100,22 @@ public class CalculatorTest {
 		}
 		
 	
+	}
+	
+	
+	public static List<String> ReadKml()
+	{
+		 Path fileName = Paths.get("C:\\Users\\sangr\\Downloads\\Directions.kml");
+		 List<String> str=null;
+     // Now calling Files.readString() method to
+     // read the file
+	     try {
+			str = Files.readAllLines(fileName);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	     
+	     return str;		
 	}
 	
 	
